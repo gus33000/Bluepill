@@ -73,6 +73,9 @@ namespace Bluepill
                     Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
                     keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
                     keyExplorer.SetValue("CanHasSuperbar", 1, RegistryValueKind.DWord);
+                    keyExplorer.Close();
+
+                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
                     keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
                     keyExplorer.Close();
 
@@ -181,6 +184,9 @@ namespace Bluepill
                 {
                     keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
                     keyExplorer.DeleteValue("CanHasSuperbar", false);
+                    keyExplorer.Close();
+
+                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
                     keyExplorer.DeleteValue("EnableCHS", false);
                     keyExplorer.Close();
 
