@@ -59,7 +59,37 @@ namespace Bluepill
 
         static void Main(string[] args)
         {
-            Install();
+            if (args.Length != 1)
+            {
+                ShowHelp();
+                return;
+            }
+
+            switch (args[0].ToLower())
+            {
+                case "install":
+                    {
+                        Install();
+                        break;
+                    }
+                case "uninstall":
+                    {
+                        Uninstall();
+                        break;
+                    }
+                default:
+                    {
+                        ShowHelp();
+                        break;
+                    }
+            }
+        }
+
+        public static void ShowHelp()
+        {
+            Console.WriteLine("\nUsage: bluepill <mode>");
+            Console.WriteLine("\n       mode:    install   - installs   bluepill");
+            Console.WriteLine("                uninstall - uninstalls bluepill");
         }
 
         public static void Install()

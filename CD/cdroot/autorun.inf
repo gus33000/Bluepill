@@ -1,0 +1,9 @@
+[autorun]
+open=bluepill.exe
+icon=bluepill.exe
+
+shell\install\command=bluepill.exe install
+shell\install=&Install Bluepill
+
+shell\uninstall\command=bluepill.exe uninstall
+shell\uninstall=&Uninstall Bluepill
