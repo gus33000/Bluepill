@@ -408,6 +408,7 @@ namespace Bluepill
                 keyExplorer.Close();
 
                 Console.WriteLine("\t-> Enabling Superbar v2");
+                Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
                 keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
                 keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
                 keyExplorer.Close();
