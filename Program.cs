@@ -295,10 +295,84 @@ namespace Bluepill
             Console.WriteLine("                uninstall - uninstalls bluepill");
         }
 
+        public static void InstallIntoPath(RegistryKey key, string oUserHive)
+        {
+            RegistryKey keyExplorer;
+
+            try
+            {
+                Console.WriteLine("\t-> Enabling Superbar v1");
+                key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
+                keyExplorer.SetValue("CanHasSuperbar", 1, RegistryValueKind.DWord);
+                keyExplorer.Close();
+
+                Console.WriteLine("\t-> Enabling Superbar v2");
+                key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
+                keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
+                keyExplorer.Close();
+
+                foreach (var guid in guids)
+                {
+                    Console.WriteLine("\t-> Installing " + guid + " lockdown CLSID");
+                    key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}");
+                    key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder");
+                    keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder", true);
+                    keyExplorer.SetValue("Attributes", -1609564156, RegistryValueKind.DWord);
+                    keyExplorer.Close();
+                }
+
+                // Thanks IE team
+                key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer", true);
+                keyExplorer.SetValue("Attributes", -1609564156, RegistryValueKind.DWord);
+                keyExplorer.Close();
+
+                Console.WriteLine("\t-> Enabling Select And Ask Preview");
+                key.CreateSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
+                keyExplorer.SetValue("DisablePreview", 0, RegistryValueKind.DWord);
+                keyExplorer.Close();
+            }
+            catch { }
+        }
+
+        public static void UninstallIntoPath(RegistryKey key, string oUserHive)
+        {
+            RegistryKey keyExplorer;
+
+            try
+            {
+                Console.WriteLine("\t-> Disabling Superbar v1");
+                key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
+                keyExplorer.DeleteValue("CanHasSuperbar", false);
+                keyExplorer.Close();
+
+                Console.WriteLine("\t-> Disabling Superbar v2");
+                key.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
+                keyExplorer.DeleteValue("EnableCHS", false);
+                keyExplorer.Close();
+
+                foreach (var guid in guids)
+                {
+                    Console.WriteLine("\t-> Uninstalling " + guid + " lockdown CLSID");
+                    key.DeleteSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}", false);
+                }
+
+                Console.WriteLine("\t-> Disabling Select And Ask Preview");
+                keyExplorer = key.OpenSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
+                keyExplorer.DeleteValue("DisablePreview", false);
+                keyExplorer.Close();
+            }
+            catch { }
+        }
+
         public static void Install()
         {
             Console.WriteLine("[i] Installing Bluepill");
-            RegistryKey keyExplorer;
 
             Console.WriteLine("-> Gathering user hives");
             string[] userHives = Registry.Users.GetSubKeyNames();
@@ -314,37 +388,7 @@ namespace Bluepill
             foreach (string oUserHive in userHives)
             {
                 Console.WriteLine("-> Installing for " + oUserHive);
-                try
-                {
-                    Console.WriteLine("\t-> Enabling Superbar v1");
-                    Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                    keyExplorer.SetValue("CanHasSuperbar", 1, RegistryValueKind.DWord);
-                    keyExplorer.Close();
-
-                    Console.WriteLine("\t-> Enabling Superbar v2");
-                    Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                    keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
-                    keyExplorer.Close();
-
-                    foreach (var guid in guids)
-                    {
-                        Console.WriteLine("\t-> Installing " + guid + " lockdown CLSID");
-                        Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}");
-                        Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder");
-                        keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder", true);
-                        keyExplorer.SetValue("Attributes", -1609564156, RegistryValueKind.DWord);
-                        keyExplorer.Close();
-                    }
-
-                    Console.WriteLine("\t-> Enabling Select And Ask Preview");
-                    Registry.Users.CreateSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                    keyExplorer.SetValue("DisablePreview", 0, RegistryValueKind.DWord);
-                    keyExplorer.Close();
-                }
-                catch { }
+                InstallIntoPath(Registry.Users, oUserHive);
             }
 
             Utils.EnablePrivileges();
@@ -359,37 +403,9 @@ namespace Bluepill
 
                         string imagePath = keyProfile.GetValue("ProfileImagePath") as string;
                         Utils.LoadRegistryHiveIntoHKU($@"{imagePath}\NTuser.dat", oProfile);
-                        try
-                        {
-                            Console.WriteLine("\t-> Enabling Superbar v1");
-                            Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                            keyExplorer.SetValue("CanHasSuperbar", 1, RegistryValueKind.DWord);
-                            keyExplorer.Close();
 
-                            Console.WriteLine("\t-> Enabling Superbar v2");
-                            Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                            keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
-                            keyExplorer.Close();
+                        InstallIntoPath(Registry.Users, oProfile);
 
-                            foreach (var guid in guids)
-                            {
-                                Console.WriteLine("\t-> Installing " + guid + " lockdown CLSID");
-                                Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}");
-                                Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder");
-                                keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder", true);
-                                keyExplorer.SetValue("Attributes", -1609564156, RegistryValueKind.DWord);
-                                keyExplorer.Close();
-                            }
-
-                            Console.WriteLine("\t-> Enabling Select And Ask Preview");
-                            Registry.Users.CreateSubKey($@"{oProfile}\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                            keyExplorer.SetValue("DisablePreview", 0, RegistryValueKind.DWord);
-                            keyExplorer.Close();
-                        }
-                        catch { }
                         Utils.UnloadRegistryHiveFromHKU(oProfile);
                     }
                     keyProfile.Close();
@@ -400,39 +416,12 @@ namespace Bluepill
             try
             {
                 Console.WriteLine("-> Installing for Default");
-
-                Console.WriteLine("\t-> Enabling Superbar v1");
-                Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                keyExplorer.SetValue("CanHasSuperbar", 1, RegistryValueKind.DWord);
-                keyExplorer.Close();
-
-                Console.WriteLine("\t-> Enabling Superbar v2");
-                Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                keyExplorer.SetValue("EnableCHS", 1, RegistryValueKind.DWord);
-                keyExplorer.Close();
-
-                foreach (var guid in guids)
-                {
-                    Console.WriteLine("\t-> Installing " + guid + " lockdown CLSID");
-                    Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}");
-                    Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder");
-                    keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}\ShellFolder", true);
-                    keyExplorer.SetValue("Attributes", -1609564156, RegistryValueKind.DWord);
-                    keyExplorer.Close();
-                }
-
-                Console.WriteLine("\t-> Enabling Select And Ask Preview");
-                Registry.Users.CreateSubKey($@"Default\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                keyExplorer.SetValue("DisablePreview", 0, RegistryValueKind.DWord);
-                keyExplorer.Close();
+                InstallIntoPath(Registry.Users, "Default");
             }
             catch { }
             Utils.UnloadRegistryHiveFromHKU("Default");
 
-            Console.WriteLine("-> Enabling lockeddown wintage apps");
+            Console.WriteLine("-> Enabling locked down wintage apps");
 
             Console.WriteLine("\t-> Enabling Calculator");
             Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Wintage\Apps\Redpill\calculator");
@@ -464,7 +453,6 @@ namespace Bluepill
         public static void Uninstall()
         {
             Console.WriteLine("[i] Uninstalling Bluepill");
-            RegistryKey keyExplorer;
 
             Console.WriteLine("-> Gathering user hives");
             string[] userHives = Registry.Users.GetSubKeyNames();
@@ -480,32 +468,7 @@ namespace Bluepill
             foreach (string oUserHive in userHives)
             {
                 Console.WriteLine("-> Uninstalling for " + oUserHive);
-                try
-                {
-                    Console.WriteLine("\t-> Disabling Superbar v1");
-                    Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                    keyExplorer.DeleteValue("CanHasSuperbar", false);
-                    keyExplorer.Close();
-
-                    Console.WriteLine("\t-> Disabling Superbar v2");
-                    Registry.Users.CreateSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                    keyExplorer.DeleteValue("EnableCHS", false);
-                    keyExplorer.Close();
-
-                    foreach (var guid in guids)
-                    {
-                        Console.WriteLine("\t-> Uninstalling " + guid + " lockdown CLSID");
-                        Registry.Users.DeleteSubKey($@"{oUserHive}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}", false);
-                    }
-
-                    Console.WriteLine("\t-> Disabling Select And Ask Preview");
-                    keyExplorer = Registry.Users.OpenSubKey($@"{oUserHive}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                    keyExplorer.DeleteValue("DisablePreview", false);
-                    keyExplorer.Close();
-                }
-                catch { }
+                UninstallIntoPath(Registry.Users, oUserHive);
             }
 
             Utils.EnablePrivileges();
@@ -520,33 +483,9 @@ namespace Bluepill
 
                         string imagePath = keyProfile.GetValue("ProfileImagePath") as string;
                         Utils.LoadRegistryHiveIntoHKU($@"{imagePath}\NTuser.dat", oProfile);
-                        try
-                        {
-                            Console.WriteLine("\t-> Disabling Superbar v1");
-                            Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                            keyExplorer.DeleteValue("CanHasSuperbar", false);
-                            keyExplorer.Close();
 
-                            Console.WriteLine("\t-> Disabling Superbar v2");
-                            Registry.Users.CreateSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                            keyExplorer.DeleteValue("EnableCHS", false);
-                            keyExplorer.Close();
+                        UninstallIntoPath(Registry.Users, oProfile);
 
-                            foreach (var guid in guids)
-                            {
-                                Console.WriteLine("\t-> Uninstalling " + guid + " lockdown CLSID");
-                                Registry.Users.DeleteSubKey($@"{oProfile}\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}", false);
-                            }
-
-                            Console.WriteLine("\t-> Disabling Select And Ask Preview");
-                            Registry.Users.CreateSubKey($@"{oProfile}\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
-                            keyExplorer = Registry.Users.OpenSubKey($@"{oProfile}\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                            keyExplorer.DeleteValue("DisablePreview", false);
-                            keyExplorer.Close();
-                        }
-                        catch { }
                         Utils.UnloadRegistryHiveFromHKU(oProfile);
                     }
                     keyProfile.Close();
@@ -558,34 +497,12 @@ namespace Bluepill
             {
                 Console.WriteLine("-> Uninstalling for Default");
 
-                Console.WriteLine("\t-> Disabling Superbar v1");
-                Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\TaskBand", true);
-                keyExplorer.DeleteValue("CanHasSuperbar", false);
-                keyExplorer.Close();
-
-                Console.WriteLine("\t-> Disabling Superbar v2");
-                Registry.Users.CreateSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true);
-                keyExplorer.DeleteValue("EnableCHS", false);
-                keyExplorer.Close();
-
-                foreach (var guid in guids)
-                {
-                    Console.WriteLine("\t-> Uninstalling " + guid + " lockdown CLSID");
-                    Registry.Users.DeleteSubKey($@"Default\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{guid}", false);
-                }
-
-                Console.WriteLine("\t-> Disabling Select And Ask Preview");
-                Registry.Users.CreateSubKey($@"Default\SOFTWARE\Microsoft\SelectAndAsk\Preferences");
-                keyExplorer = Registry.Users.OpenSubKey($@"Default\SOFTWARE\Microsoft\SelectAndAsk\Preferences", true);
-                keyExplorer.DeleteValue("DisablePreview", false);
-                keyExplorer.Close();
+                UninstallIntoPath(Registry.Users, "Default");
             }
             catch { }
             Utils.UnloadRegistryHiveFromHKU("Default");
 
-            Console.WriteLine("-> Disabling lockeddown wintage apps");
+            Console.WriteLine("-> Disabling locked down wintage apps");
 
             Console.WriteLine("\t-> Disabling Calculator");
             Registry.LocalMachine.DeleteSubKey(@"Software\Microsoft\Windows\CurrentVersion\Wintage\Apps\Redpill\calculator", false);
