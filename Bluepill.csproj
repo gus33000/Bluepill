@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{705C535C-2267-4657-B66B-E805D9CAC844}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Bluepill</RootNamespace>
     <AssemblyName>Bluepill</AssemblyName>
     <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -40,16 +42,129 @@
   <PropertyGroup>
     <ApplicationIcon>Bluepill.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bluepill.UI\Aero\Aero.cs" />
+    <Compile Include="Bluepill.UI\BluepillProgressClass.cs" />
+    <Compile Include="Bluepill.UI\BluepillProgressInterface.cs" />
+    <Compile Include="Bluepill.UI\Dialogs.cs" />
+    <Compile Include="BPMain.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="WindowsFormsAero\AeroForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\Button.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\ComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\CommandLink.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\Dwm\CloakedStatus.cs" />
+    <Compile Include="WindowsFormsAero\Dwm\DwmCompositionException.cs" />
+    <Compile Include="WindowsFormsAero\Dwm\DwmManager.cs" />
+    <Compile Include="WindowsFormsAero\Dwm\Thumbnail.cs" />
+    <Compile Include="WindowsFormsAero\Dwm\ThumbnailViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\Flip3dPolicy.cs" />
+    <Compile Include="WindowsFormsAero\GeometryExtensions.cs" />
+    <Compile Include="WindowsFormsAero\HorizontalPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\LabeledDivider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\ListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\Native\BitBlpOp.cs" />
+    <Compile Include="WindowsFormsAero\Native\BitmapInfo.cs" />
+    <Compile Include="WindowsFormsAero\Native\ButtonSplitInfo.cs" />
+    <Compile Include="WindowsFormsAero\Native\ButtonStyle.cs" />
+    <Compile Include="WindowsFormsAero\Native\ClassLong.cs" />
+    <Compile Include="WindowsFormsAero\Native\DttOpts.cs" />
+    <Compile Include="WindowsFormsAero\Native\DttOptsFlags.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmBlurBehind.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmBlurBehindFlags.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmMethods.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmSize.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmThumbnailFlags.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmThumbnailProperties.cs" />
+    <Compile Include="WindowsFormsAero\Native\DwmWindowAttribute.cs" />
+    <Compile Include="WindowsFormsAero\Native\HitTest.cs" />
+    <Compile Include="WindowsFormsAero\Native\IntHelpers.cs" />
+    <Compile Include="WindowsFormsAero\Native\IVirtualDesktopManager.cs" />
+    <Compile Include="WindowsFormsAero\Native\ListViewExtendedStyle.cs" />
+    <Compile Include="WindowsFormsAero\Native\Margins.cs" />
+    <Compile Include="WindowsFormsAero\Native\Methods.cs" />
+    <Compile Include="WindowsFormsAero\Native\Point.cs" />
+    <Compile Include="WindowsFormsAero\Native\ProgressBarState.cs" />
+    <Compile Include="WindowsFormsAero\Native\ProgressBarStyle.cs" />
+    <Compile Include="WindowsFormsAero\Native\Rect.cs" />
+    <Compile Include="WindowsFormsAero\Native\Size.cs" />
+    <Compile Include="WindowsFormsAero\Native\StructWrapper.cs" />
+    <Compile Include="WindowsFormsAero\Native\SystemErrorCode.cs" />
+    <Compile Include="WindowsFormsAero\Native\TextShadowType.cs" />
+    <Compile Include="WindowsFormsAero\Native\TreeViewExtendedStyle.cs" />
+    <Compile Include="WindowsFormsAero\Native\TreeViewStyle.cs" />
+    <Compile Include="WindowsFormsAero\Native\UwpMethods.cs" />
+    <Compile Include="WindowsFormsAero\Native\WindowExStyles.cs" />
+    <Compile Include="WindowsFormsAero\Native\WindowLong.cs" />
+    <Compile Include="WindowsFormsAero\Native\WindowMessage.cs" />
+    <Compile Include="WindowsFormsAero\Native\WindowStyles.cs" />
+    <Compile Include="WindowsFormsAero\Native\WindowTheme.cs" />
+    <Compile Include="WindowsFormsAero\OSSupport.cs" />
+    <Compile Include="WindowsFormsAero\ProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\ProgressBarState.cs" />
+    <Compile Include="WindowsFormsAero\Resources\ExceptionMessages.Designer.cs" />
+    <Compile Include="WindowsFormsAero\Resources\Pictures.Designer.cs" />
+    <Compile Include="WindowsFormsAero\SplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\SplitMenuEventArgs.cs" />
+    <Compile Include="WindowsFormsAero\StoreAppHelper.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\CommonButton.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\CommonButtonResult.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\CommonIcon.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\CustomButton.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\EventArgs.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\Message.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\NativeMethods.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\Results.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\TaskDialog.cs" />
+    <Compile Include="WindowsFormsAero\TaskDialog\TaskDialog_static.cs" />
+    <Compile Include="WindowsFormsAero\TextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\ThemedText.cs" />
+    <Compile Include="WindowsFormsAero\ThemeLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\TreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\VerticalPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WindowsFormsAero\VirtualDesktop.cs" />
+    <Compile Include="WindowsFormsAero\VirtualDesktopManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -57,6 +172,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Bluepill.ico" />
+    <Content Include="WindowsFormsAero\Resources\active_search.png" />
+    <Content Include="WindowsFormsAero\Resources\inactive_search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WindowsFormsAero\Resources\ExceptionMessages.resx" />
+    <EmbeddedResource Include="WindowsFormsAero\Resources\Pictures.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
